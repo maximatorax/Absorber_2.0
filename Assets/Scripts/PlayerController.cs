@@ -7,14 +7,14 @@ public class PlayerController : MonoBehaviour
 {
     private CharacterController controller;
     private Vector3 playerVelocity = Vector3.zero;
-    private Vector3 moveDirection = Vector3.zero;
     private float gravity = Physics.gravity.y;
-
+    private float turnSmoothVelocity;
 
     [SerializeField] private float speed = 2.0f;
     [SerializeField] private float runningSpeed = 4.0f;
     [SerializeField] private float jumpHeight = 5.0f;
-    [SerializeField] private float rotationSpeed = 240f;
+    [SerializeField] private float turnSmoothTime = 0.1f;
+    [SerializeField] private Transform cam;
 
     [SerializeField] private CinemachineVirtualCamera aimVirtualCamera;
 
@@ -27,31 +27,30 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
 
-        Vector3 move = v * transform.forward + h * transform.right;
+        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (move.magnitude > 1f) move.Normalize();
-
-        // Calculate the rotation for the player
-        move = transform.InverseTransformDirection(move);
-
-        // Get Euler angles
-        float turnAmount = Mathf.Atan2(move.x, move.z);
-
-        transform.Rotate(0, turnAmount * rotationSpeed * Time.deltaTime, 0);
-
-        moveDirection = transform.forward * move.magnitude;
-
-        if (Input.GetButton("Sprint"))
+        if (direction.magnitude >= 0.1f)
         {
-            controller.Move(moveDirection.normalized * Time.deltaTime * runningSpeed);
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, 
+                ref turnSmoothVelocity, turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+            Vector3 moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+
+            if (Input.GetButton("Sprint"))
+            {
+                controller.Move(moveDirection.normalized * runningSpeed * Time.deltaTime);
+            }
+            else
+            {
+                controller.Move(moveDirection.normalized * speed * Time.deltaTime);
+            }
         }
-        else
-        {
-            controller.Move(moveDirection.normalized * Time.deltaTime * speed);
-        }
+
 
         if (controller.isGrounded && Input.GetButton("Jump") )
         {
