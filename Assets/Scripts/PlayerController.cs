@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    private AbilitySystem abilitySystem;
+
     private CharacterController controller;
     private Vector3 playerVelocity = Vector3.zero;
     private float gravity = Physics.gravity.y;
@@ -26,6 +28,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        abilitySystem = GetComponent<AbilitySystem>();
     }
 
     // Update is called once per frame
@@ -98,9 +101,11 @@ public class PlayerController : MonoBehaviour
 
                 aimTargetFollow.transform.Rotate(dir.normalized * Time.deltaTime * rotationSpeed);
             }
-            
-            
-            
+        }
+
+        if (Input.GetButtonDown("Fire1"))
+        {
+            abilitySystem.UseAbility(abilitySystem.selectedAbility);
         }
 
     }
