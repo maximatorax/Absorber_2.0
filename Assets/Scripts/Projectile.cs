@@ -8,6 +8,7 @@ public class Projectile : MonoBehaviour
     public Vector3 spawnPosition;
     public Ability abilityReference;
     public AbilitySystem caster;
+    public float speed;
 
     void Awake()
     {

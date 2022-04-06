@@ -40,6 +40,10 @@ public class HealthSystem : MonoBehaviour
 
     void Die()
     {
+        if (gameObject.tag == "Enemy")
+        {
+            gameObject.GetComponent<EnemyController>().death.Invoke();
+        }
         Destroy(gameObject);
     }
 

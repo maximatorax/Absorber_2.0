@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b247164cfcf0bc4a96337e60a5b53a3, type: 3}
-  m_Name: TestAbility
+  m_Name: AbilityToGiveTest
   m_EditorClassIdentifier: 
-  projectile: {fileID: 2565358038012672287, guid: 8596b3f2a3acd4941ac983564d56c341, type: 3}
-  range: 10
-  damage: 10
-  cooldown: 0.5
-  duration: 0
-  genre: 00000000
+  projectile: {fileID: 0}
+  range: 5
+  damage: 5
+  cooldown: 5
+  duration: 3
+  genre: 02000000
   element: 0
-  type: 0
+  type: 1
   effect: 0
-  nbOfUse: 0
+  nbOfUse: 2
   target: Enemy
   layermask:
     serializedVersion: 2

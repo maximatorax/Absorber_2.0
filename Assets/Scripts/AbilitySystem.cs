@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cinemachine.Utility;
@@ -11,6 +12,24 @@ public class AbilitySystem : MonoBehaviour
     [SerializeField] private Transform cam;
     [SerializeField] private RectTransform crosshair;
 
+    public Ability selectedAbility;
+    private int selectedAbilityIndex;
+    public int maxNbOfAbilities;
+
+    private Event keyPressed;
+
+    private KeyCode[] keyCodes = {
+        KeyCode.Alpha1,
+        KeyCode.Alpha2,
+        KeyCode.Alpha3,
+        KeyCode.Alpha4,
+        KeyCode.Alpha5,
+        KeyCode.Alpha6,
+        KeyCode.Alpha7,
+        KeyCode.Alpha8,
+        KeyCode.Alpha9,
+        KeyCode.Alpha0
+    };
 
     // Start is called before the first frame update
     void Start()
@@ -19,18 +38,76 @@ public class AbilitySystem : MonoBehaviour
         {
             ability.canDo = true;
         }
+
+        selectedAbilityIndex = 0;
+        selectedAbility = abilities[selectedAbilityIndex];
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.mouseScrollDelta.y > 0.0f)
+        {
+            selectedAbilityIndex++;
+            if (selectedAbilityIndex >= abilities.Count)
+            {
+                selectedAbilityIndex = abilities.Count - 1;
+            }
+            if (selectedAbilityIndex > maxNbOfAbilities)
+            {
+                selectedAbilityIndex = maxNbOfAbilities;
+            }
+            selectedAbility = abilities[selectedAbilityIndex];
+        }
+        if (Input.mouseScrollDelta.y < 0.0f)
+        {
+            selectedAbilityIndex--;
+            if (selectedAbilityIndex < 0)
+            {
+                selectedAbilityIndex = 0;
+            }
+            selectedAbility = abilities[selectedAbilityIndex];
+        }
+
+        /*try
+        {
+            if (keyPressed.numeric)
+            {
+                for (int i = 0; i < keyCodes.Length; i++)
+                {
+                    if (Input.GetKeyDown(keyCodes[i]))
+                    {
+                        selectedAbilityIndex = i;
+                        selectedAbility = abilities[selectedAbilityIndex];
+                    }
+                }
+            }
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }*/
     }
 
     public void UseAbility(Ability abilityToUse)
     {
         if(abilityToUse.canDo == false) return;
+
         abilityToUse.canDo = false;
+
+        if (abilityToUse.type != Ability.attackType.Base)
+        {
+            abilityToUse.nbOfTimeUsed++;
+
+            if (abilityToUse.nbOfTimeUsed >= abilityToUse.nbOfUse)
+            {
+                abilityToUse.nbOfTimeUsed = 0;
+                RemoveAbility(abilityToUse);
+            }
+        }
+
         StartCoroutine(doAbility(abilityToUse));
     }
 
@@ -51,11 +128,11 @@ public class AbilitySystem : MonoBehaviour
                 if (Physics.Raycast(Camera.main.ScreenToWorldPoint(crosshairPosition), cam.forward,
                         out hit, abilityToUse.range, abilityToUse.layermask))
                 {
-                    go.GetComponent<Rigidbody>().velocity = (hit.point - transform.position) * hit.distance;
+                    go.GetComponent<Rigidbody>().AddForce((hit.point - transform.position).normalized * go.GetComponent<Projectile>().speed); 
                 }
                 else
                 {
-                    go.GetComponent<Rigidbody>().velocity = cam.forward * abilityToUse.range;
+                    go.GetComponent<Rigidbody>().AddForce(cam.forward * go.GetComponent<Projectile>().speed);
                 }
             }
             else
@@ -63,11 +140,11 @@ public class AbilitySystem : MonoBehaviour
                 if (Physics.Raycast(transform.position, transform.forward,
                         out hit, abilityToUse.range, abilityToUse.layermask))
                 {
-                    go.GetComponent<Rigidbody>().velocity = (hit.point - transform.position) * hit.distance;
+                    go.GetComponent<Rigidbody>().AddForce((hit.point - transform.position).normalized * go.GetComponent<Projectile>().speed);
                 }
                 else
                 {
-                    go.GetComponent<Rigidbody>().velocity = transform.forward * abilityToUse.range;
+                    go.GetComponent<Rigidbody>().AddForce(transform.forward * go.GetComponent<Projectile>().speed);
                 }
             }
         }
@@ -75,8 +152,6 @@ public class AbilitySystem : MonoBehaviour
         {
             foreach (var genre in abilityToUse.genre)
             {
-
-
                 if (abilityToUse.genre.Contains(Ability.attackGenre.Damage) ||
                     abilityToUse.genre.Contains(Ability.attackGenre.Dot) ||
                     abilityToUse.genre.Contains(Ability.attackGenre.Debuff))
@@ -160,16 +235,6 @@ public class AbilitySystem : MonoBehaviour
             }
         }
 
-        if (abilityToUse.type != Ability.attackType.Base)
-        {
-            abilityToUse.nbOfUse--;
-
-            if (abilityToUse.nbOfUse <= 0)
-            {
-                RemoveAbility(abilityToUse);
-            }
-        }
-
         yield return new WaitForSeconds(abilityToUse.cooldown);
 
         abilityToUse.canDo = true;
@@ -177,12 +242,25 @@ public class AbilitySystem : MonoBehaviour
 
     public void AddAbility(Ability abilityToAdd)
     {
-        abilities.Add(abilityToAdd);
-        abilityToAdd.canDo = true;
+        if (abilities.Contains(abilityToAdd))
+        {
+            abilities[abilities.IndexOf(abilityToAdd)].nbOfTimeUsed -= abilityToAdd.nbOfUse;
+        }
+        else if(abilities.Count < maxNbOfAbilities)
+        {
+            abilities.Add(abilityToAdd);
+            abilityToAdd.canDo = true;
+        }
+        else
+        {
+            ReplaceAbility();
+        }
     }
 
     public void RemoveAbility(Ability abilityToRemove)
     {
+        selectedAbilityIndex = abilities.IndexOf(abilityToRemove) - 1;
+        selectedAbility = abilities[selectedAbilityIndex];
         abilities.Remove(abilityToRemove);
     }
 
@@ -209,5 +287,10 @@ public class AbilitySystem : MonoBehaviour
             target.Heal(amount);
         }
 
+    }
+
+    void ReplaceAbility()
+    {
+        //Write replace ability menu code
     }
 }

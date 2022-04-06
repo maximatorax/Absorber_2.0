@@ -22,5 +22,6 @@ public class Ability : ScriptableObject
     public int nbOfUse;
     public string target;
     public LayerMask layermask;
+    public int nbOfTimeUsed;
     public bool canDo;
 }

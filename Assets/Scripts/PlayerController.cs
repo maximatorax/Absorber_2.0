@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    public AbilitySystem abilitySystem;
+    private AbilitySystem abilitySystem;
 
     private CharacterController controller;
     private Vector3 playerVelocity = Vector3.zero;
@@ -101,12 +101,11 @@ public class PlayerController : MonoBehaviour
 
                 aimTargetFollow.transform.Rotate(dir.normalized * Time.deltaTime * rotationSpeed);
             }
+        }
 
-            if (Input.GetButtonDown("Fire1"))
-            {
-                abilitySystem.UseAbility(abilitySystem.abilities[0]);
-            }
-
+        if (Input.GetButtonDown("Fire1"))
+        {
+            abilitySystem.UseAbility(abilitySystem.selectedAbility);
         }
 
     }
