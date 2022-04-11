@@ -114,7 +114,7 @@ MonoBehaviour:
   spawnPosition: {x: 0, y: 0, z: 0}
   abilityReference: {fileID: 11400000, guid: a7b5c7ef0cf3ad049983274fc62d78c8, type: 2}
   caster: {fileID: 0}
-  speed: 100
+  speed: 300
 --- !u!54 &-2277591345690907546
 Rigidbody:
   m_ObjectHideFlags: 0
