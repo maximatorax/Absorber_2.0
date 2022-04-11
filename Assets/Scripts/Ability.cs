@@ -24,4 +24,5 @@ public class Ability : ScriptableObject
     public LayerMask layermask;
     public int nbOfTimeUsed;
     public bool canDo;
+    public Sprite abilityIcon;
 }

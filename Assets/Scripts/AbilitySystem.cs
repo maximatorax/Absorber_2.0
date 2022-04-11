@@ -8,6 +8,7 @@ using Quaternion = UnityEngine.Quaternion;
 public class AbilitySystem : MonoBehaviour
 {
     public List<Ability> abilities;
+    public List<Sprite> abilitiesIcons;
 
     [SerializeField] private Transform cam;
     [SerializeField] private RectTransform crosshair;
@@ -37,6 +38,11 @@ public class AbilitySystem : MonoBehaviour
         foreach (var ability in abilities)
         {
             ability.canDo = true;
+        }
+
+        for (int x = 0; x < abilities.Count; x++)
+        {
+            abilitiesIcons.Add(abilities[x].abilityIcon);
         }
 
         selectedAbilityIndex = 0;
@@ -250,6 +256,7 @@ public class AbilitySystem : MonoBehaviour
         {
             abilities.Add(abilityToAdd);
             abilityToAdd.canDo = true;
+            abilitiesIcons.Add(abilityToAdd.abilityIcon);
         }
         else
         {
@@ -262,6 +269,7 @@ public class AbilitySystem : MonoBehaviour
         selectedAbilityIndex = abilities.IndexOf(abilityToRemove) - 1;
         selectedAbility = abilities[selectedAbilityIndex];
         abilities.Remove(abilityToRemove);
+        abilitiesIcons.Remove(abilityToRemove.abilityIcon);
     }
 
     void DoDamage(int damage, HealthSystem target)

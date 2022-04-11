@@ -28,3 +28,4 @@ MonoBehaviour:
     m_Bits: 1024
   nbOfTimeUsed: 0
   canDo: 1
+  abilityIcon: {fileID: 21300000, guid: 0e1cd18d62c219c4ca5842cc281500e6, type: 3}
